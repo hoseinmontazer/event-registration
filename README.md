@@ -1,0 +1,2 @@
+# python-jwt-authentication
+djoser
