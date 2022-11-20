@@ -15,9 +15,12 @@ class Time_Table(APIView):
         content=[]
         try:
             print("hi try")
-            checkTaskName = task.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
-            for p in checkTaskName:
-                print ("hi p",p)
+            AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
+            #AllEvent = time_table.objects.raw('SELECT * FROM `api_time_table` WHERE user_id =2')
+            print(AllEvent)
+            print (len(AllEvent))
+            for p in AllEvent:
+                #print ("hi p",p)
                 updateContent = {'summery_event': p.summery_event, 'start_time': p.start_time,'end_time': p.end_time}
                 content.append(updateContent)
             return Response(content)
@@ -118,33 +121,88 @@ class EditEVENT (APIView):
 
     def post(self, request):
         userId = request.user.id
-        EventSummery = request.headers['EventSummery']
-        #print(EventSummery)
+
+        #check start time is avaliable
         if (len(request.headers['StartTime']) == 0):
             print (len(request.headers['StartTime']))
             StartTime = None
-            print ("ssss",StartTime)
+            print ("StartTime is :",StartTime)
         else:
             StartTime = datetime.datetime.fromtimestamp(int(request.headers['StartTime']))
-        #print(StartTime)
-        if (len(request.headers['EndTime']) == 0):
-            print (len(request.headers['EndTime']))
-            EndTime = None
+            print("StartTime is :",StartTime)
+
+
+        #check start time is temporary event summery 
+        if (len(request.headers['TempEventSummery']) == 0):
+            print (len(request.headers['TempEventSummery']))
+            TempEventSummery = None
+            print ("TempEventSummery is :",TempEventSummery)
         else:
-            EndTime = datetime.datetime.fromtimestamp(int(request.headers['EndTime']))
+            TempEventSummery = request.headers['TempEventSummery']
+            print("TempEventSummery is :",TempEventSummery)
+
+        #check temporary start time is avaliable
+        if (len(request.headers['TempStartTime']) == 0):
+            print (len(request.headers['TempStartTime']))
+            TempStartTime = None
+            print ("ssss",TempStartTime)
+        else:
+            TempStartTime = datetime.datetime.fromtimestamp(int(request.headers['TempStartTime']))
+            print("TempStartTime is :",TempStartTime)
+
+        #check  temporary end time is avaliable
+        if (len(request.headers['TempEndTime']) == 0):
+            print (len(request.headers['TempEndTime']))
+            TempEndTime = None
+        else:
+            TempEndTime = datetime.datetime.fromtimestamp(int(request.headers['TempEndTime']))
+            print("TempEndTime is :",TempEndTime)
+
+
+
         try:
-            print (userId,EventSummery,StartTime,EndTime)
-            GetEventId = time_table.objects.raw('select id from api_time_table WHERE start_time=%s AND user_id =%s',[StartTime, userId])
-            for p in GetEventId:
-                EventId=p
-                print("qqqqqq", EventId)
-            if time_table.objects.filter(id=EventId) :
-                editTaskName = task.objects.filter(id=EventId).update(summery_event=EventSummery,start_time=StartTime  ,end_time=EndTime)
-                content = {'message': 'your task was been edited'}
-                return Response(content)
+            if ( StartTime == None ):
+                    content = {'message': 'start time can not be empty or null'}
+                    return Response(content) 
             else:
-                content = {'message': 'not editeable task'}
-                return Response(content)
+                print ("alll parameters is :",userId,TempEventSummery,TempStartTime,TempEndTime,StartTime)
+                GetEventId = time_table.objects.raw('select * from api_time_table WHERE start_time=%s AND user_id =%s',[StartTime, userId])
+                if len(GetEventId) == 0 :
+                    content = {'message': 'query is not valid'}
+                    return Response(content)
+                else:
+                    print("get event id:", GetEventId)
+                    for p in GetEventId:
+                        EventId=p.id
+                        EventSummery=p.summery_event
+                        StartTime=p.start_time                    
+                        EndTime=p.end_time
+                        print("qqqqqq", EventId ,EventSummery, StartTime, EndTime )
+                    if time_table.objects.filter(id=EventId) and TempEventSummery == None and TempStartTime == None and TempEndTime == None:
+                        editTaskName = time_table.objects.filter(id=EventId).update(summery_event=EventSummery,start_time=StartTime  ,end_time=EndTime)
+                        content = {'message': 'your task was been edited without any change'}
+                        return Response(content)
+                    elif time_table.objects.filter(id=EventId) and TempEventSummery != None and TempStartTime != None and TempEndTime != None:
+                        editTaskName = time_table.objects.filter(id=EventId).update(summery_event=TempEventSummery,start_time=TempStartTime  ,end_time=TempEndTime)
+                        content = {'message': 'your task was been edited with change the start time and end amd summery'}
+                        return Response(content) 
+                    elif time_table.objects.filter(id=EventId) and TempEventSummery == None and TempStartTime != None and TempEndTime != None:
+                        editTaskName = time_table.objects.filter(id=EventId).update(summery_event=EventSummery,start_time=TempStartTime  ,end_time=TempEndTime)
+                        content = {'message': 'your task was been edited with change start and end time'}
+                        return Response(content)
+                    elif time_table.objects.filter(id=EventId) and TempEventSummery == None and TempStartTime == None and TempEndTime != None:
+                        editTaskName = time_table.objects.filter(id=EventId).update(summery_event=EventSummery,start_time=StartTime  ,end_time=TempEndTime)
+                        content = {'message': 'your task was been edited with change the end time'}
+                        return Response(content) 
+
+                    elif time_table.objects.filter(id=EventId) and TempEventSummery == None and TempStartTime != None and TempEndTime == None:
+                        editTaskName = time_table.objects.filter(id=EventId).update(summery_event=EventSummery,start_time=TempStartTime  ,end_time=EndTime)
+                        content = {'message': 'your task was been edited with change the start time'}
+                        return Response(content) 
+                    else:
+                        content = {'message': 'not editeable task'}
+                        return Response(content)
+
         except Exception as e:
             content = {'message': 'your task was not edited , try again'}
             return Response(content)
