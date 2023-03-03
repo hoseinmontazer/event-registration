@@ -15,7 +15,6 @@ SECRET_KEY = 'django-insecure-3o_3vjj8gqmc!%b=92%a6)flsd4ja%lo*k340#j82*l_wuqfd^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -31,6 +30,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'api',
+    'corsheaders',
 ]
 
 AUTH_USER_MODEL = 'api.User'
@@ -60,12 +60,19 @@ DJOSER = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware"
 ]
+
+
+ALLOWED_HOSTS = ['*']
+CORS_ALLOW_ALL_ORIGINS = True
+
+
 
 ROOT_URLCONF = 'app.urls'
 
@@ -102,10 +109,10 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'time_sheet',
+        'NAME': 'time-sheet',
         'USER': 'time-sheet',
-        'PASSWORD': '123456',
-        'HOST': '10.4.2.21',
+        'PASSWORD': '12345',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }

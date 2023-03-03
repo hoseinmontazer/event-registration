@@ -12,13 +12,21 @@ class Time_Table(APIView):
 
     def get(self, request):
         userId = request.user.id
+        
+        print("aaaaaaaaaaaa",len(request.headers['pubDate']))
         content=[]
         try:
-            print("hi try")
-            AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
-            #AllEvent = time_table.objects.raw('SELECT * FROM `api_time_table` WHERE user_id =2')
-            print(AllEvent)
-            print (len(AllEvent))
+            if  request.headers['pubDate']:
+                pubDate= request.headers['pubDate']
+                print("sssssss",pubDate)
+                print("wow")
+ 
+                AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
+                #AllEvent = time_table.objects.raw('SELECT * FROM `api_time_table` WHERE user_id =2')
+            else:
+                print ("hhhhhhhhhhhhhhhh",len(request.headers['StartTime']))
+                AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
+
             for p in AllEvent:
                 #print ("hi p",p)
                 updateContent = {'summery_event': p.summery_event, 'start_time': p.start_time,'end_time': p.end_time}
@@ -45,7 +53,7 @@ class CreateEvent(APIView):
             print ("ssss",StartTime)
         else:
             StartTime = datetime.datetime.fromtimestamp(int(request.headers['StartTime']))
-        #print(StartTime)
+            print("ssss2",StartTime)
         if (len(request.headers['EndTime']) == 0):
             print (len(request.headers['EndTime']))
             EndTime = None
