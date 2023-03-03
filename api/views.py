@@ -12,20 +12,18 @@ class Time_Table(APIView):
 
     def get(self, request):
         userId = request.user.id
-        
-        print("aaaaaaaaaaaa",len(request.headers['pubDate']))
+        pubDate = request.headers['pubDate']
+        print(pubDate)
         content=[]
         try:
-            if  request.headers['pubDate']:
-                pubDate= request.headers['pubDate']
-                print("sssssss",pubDate)
-                print("wow")
- 
+            if pubDate == "null":
+                print ("notavalable")
                 AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
                 #AllEvent = time_table.objects.raw('SELECT * FROM `api_time_table` WHERE user_id =2')
             else:
-                print ("hhhhhhhhhhhhhhhh",len(request.headers['StartTime']))
-                AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
+                #print("aaaaaaaaa", pubDate)
+                #AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s AND ', [userId])
+                AllEvent = time_table.objects.raw('SELECT * FROM api_time_table WHERE  date(start_time) = %s ', [pubDate])
 
             for p in AllEvent:
                 #print ("hi p",p)
