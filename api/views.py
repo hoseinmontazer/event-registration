@@ -12,10 +12,10 @@ class Time_Table(APIView):
 
     def get(self, request):
         userId = request.user.id
-        pubDate = request.headers['pubDate']
-        print(pubDate)
+        
         content=[]
         try:
+            pubDate = request.headers['pubDate']
             if pubDate == "null":
                 print ("notavalable")
                 AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
@@ -31,7 +31,7 @@ class Time_Table(APIView):
                 content.append(updateContent)
             return Response(content)
         except:
-            return Response({"status":"400","mesage":"event not found"})
+            return Response({"status":"400","message":"event not found or publish date not avalable"})
 
 
 class CreateEvent(APIView):
