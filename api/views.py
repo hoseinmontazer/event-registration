@@ -6,6 +6,7 @@ import datetime
 import time
 import pytz
 from django.utils import timezone
+import json
 
 class Time_Table(APIView):
     permission_classes = (IsAuthenticated,)
@@ -43,20 +44,23 @@ class CreateEvent(APIView):
         user = request.user
         print(user)
         userId=request.user.id
-        EventSummery = request.headers['EventSummery']
+        body_unicode = request.body.decode('utf-8')
+        body = json.loads(body_unicode)
+        print("body",body)
+        EventSummery = body['EventSummery']
         #print(EventSummery)
-        if (len(request.headers['StartTime']) == 0):
-            print (len(request.headers['StartTime']))
+        if (len(body['StartTime']) == 0):
+            print (len(body['StartTime']))
             StartTime = None
             print ("ssss",StartTime)
         else:
-            StartTime = datetime.datetime.fromtimestamp(int(request.headers['StartTime']))
+            StartTime = datetime.datetime.fromtimestamp(int(body['StartTime']))
             print("ssss2",StartTime)
-        if (len(request.headers['EndTime']) == 0):
-            print (len(request.headers['EndTime']))
+        if (len(body['EndTime']) == 0):
+            print (len(body['EndTime']))
             EndTime = None
         else:
-            EndTime = datetime.datetime.fromtimestamp(int(request.headers['EndTime']))
+            EndTime = datetime.datetime.fromtimestamp(int(body['EndTime']))
         
         #print(request.user.id)
         if (StartTime != None and EndTime != None):
