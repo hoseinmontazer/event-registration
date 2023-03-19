@@ -8,15 +8,18 @@ import pytz
 from django.utils import timezone
 import json
 
+
+
 class Time_Table(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         userId = request.user.id
-        
+        print(userId)
         content=[]
         try:
             pubDate = request.headers['pubDate']
+            print(pubDate)
             if pubDate == "null":
                 print ("notavalable")
                 AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
@@ -24,7 +27,7 @@ class Time_Table(APIView):
             else:
                 #print("aaaaaaaaa", pubDate)
                 #AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s AND ', [userId])
-                AllEvent = time_table.objects.raw('SELECT * FROM api_time_table WHERE  date(start_time) = %s ', [pubDate])
+                AllEvent = time_table.objects.raw('SELECT * FROM api_time_table WHERE  date(start_time) = %s AND user_id=%s ', [pubDate,userId])
 
             for p in AllEvent:
                 #print ("hi p",p)
@@ -86,6 +89,8 @@ class CreateEvent(APIView):
         else:
                 content = {'message': 'start time or endtime is empty'}
                 return Response(content)            
+
+
 
 
 
