@@ -16,16 +16,19 @@ class Time_Table(APIView):
         print(userId)
         content=[]
         try:
-            pubDate = request.headers['pubDate']
-            print(pubDate)
-            if pubDate == "null":
-                print ("not available")
-                AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
-                #AllEvent = time_table.objects.raw('SELECT * FROM `api_time_table` WHERE user_id =2')
-            else:
-                #print("aaaaaaaaa", pubDate)
-                #AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s AND ', [userId])
+            if 'pubDate' in request.headers:
+                pubDate = request.headers['pubDate']
+                print(pubDate)
                 AllEvent = time_table.objects.raw('SELECT * FROM api_time_table WHERE  date(start_time) = %s AND user_id=%s ', [pubDate,userId])
+                # if not pubDate :
+                #     print ("not available")
+                #     AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
+                #     #AllEvent = time_table.objects.raw('SELECT * FROM `api_time_table` WHERE user_id =2')
+            else:
+                AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
+                    #print("aaaaaaaaa", pubDate)
+                    #AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s AND ', [userId])
+                    #AllEvent = time_table.objects.raw('SELECT * FROM api_time_table WHERE  date(start_time) = %s AND user_id=%s ', [pubDate,userId])
 
             for p in AllEvent:
                 #print ("hi p",p)
@@ -195,49 +198,49 @@ class EditEVENT (APIView):
 
 
 
-class TaskHistory(APIView):
-    permission_classes = (IsAuthenticated,)
-    def post(self, request):
-        userId = request.user.id
-        taskName = request.headers['task-name']
-        content=[]
-        try:
-            getTaskId = task.objects.raw('select id from api_task WHERE task_name=%s AND user_id =%s',[taskName, userId])
-            for p in getTaskId:
-                taskId=p.id
-            print('hiiiiiiiii',task.objects.filter(id=taskId))
-            if task.objects.filter(id=taskId):
-                checkTaskHistory = task.objects.raw('SELECT * FROM `api_task_detail` WHERE task_id =%s', [taskId])
-                for p in checkTaskHistory:
-                    updateContent = {'id': p.id,'comment': p.comment, 'start_task': p.start_task,'stop_task': p.stop_task}
-                    content.append(updateContent)
-                return Response(content)
-        except Exception as e:
-            content = {'message': 'can not find history , try again'}
-            return Response(content)
+# class TaskHistory(APIView):
+#     permission_classes = (IsAuthenticated,)
+#     def post(self, request):
+#         userId = request.user.id
+#         taskName = request.headers['task-name']
+#         content=[]
+#         try:
+#             getTaskId = task.objects.raw('select id from api_task WHERE task_name=%s AND user_id =%s',[taskName, userId])
+#             for p in getTaskId:
+#                 taskId=p.id
+#             print('hiiiiiiiii',task.objects.filter(id=taskId))
+#             if task.objects.filter(id=taskId):
+#                 checkTaskHistory = task.objects.raw('SELECT * FROM `api_task_detail` WHERE task_id =%s', [taskId])
+#                 for p in checkTaskHistory:
+#                     updateContent = {'id': p.id,'comment': p.comment, 'start_task': p.start_task,'stop_task': p.stop_task}
+#                     content.append(updateContent)
+#                 return Response(content)
+#         except Exception as e:
+#             content = {'message': 'can not find history , try again'}
+#             return Response(content)
 
 
 
-class TaskEditHistory(APIView):
-    permission_classes = (IsAuthenticated,)
-    def post(self, request):
-        userId = request.user.id
-        historyTaskId = request.headers['history-id']
+# class TaskEditHistory(APIView):
+#     permission_classes = (IsAuthenticated,)
+#     def post(self, request):
+#         userId = request.user.id
+#         historyTaskId = request.headers['history-id']
 
-        tempComment = request.headers['comment']
-        tempStartTask = request.headers['start-task']
-        tempStopTask = request.headers['stop-task']
-        print(tempStopTask,tempStartTask,tempComment)
-        try:
-            if task.objects.filter(id=historyTaskId):
-                print('hiiii')
-                editTaskName = task_detail.objects.filter(id=historyTaskId).update(comment=tempComment, start_task=tempStartTask,
-                                                                     stop_task=tempStopTask)
-                content = {'message': 'your history of id was been edited'}
-                return Response(content)
-        except Exception as e:
-            content = {'message': 'can not find history id , try again'}
-            return Response(content)
+#         tempComment = request.headers['comment']
+#         tempStartTask = request.headers['start-task']
+#         tempStopTask = request.headers['stop-task']
+#         print(tempStopTask,tempStartTask,tempComment)
+#         try:
+#             if task.objects.filter(id=historyTaskId):
+#                 print('hiiii')
+#                 editTaskName = task_detail.objects.filter(id=historyTaskId).update(comment=tempComment, start_task=tempStartTask,
+#                                                                      stop_task=tempStopTask)
+#                 content = {'message': 'your history of id was been edited'}
+#                 return Response(content)
+#         except Exception as e:
+#             content = {'message': 'can not find history id , try again'}
+#             return Response(content)
 
 
 
