@@ -2,8 +2,6 @@ from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.contrib.auth.models import User
-
-
 # Create your models here.
 class UserManager(BaseUserManager):
     def create_user(self, email,  password=None, **kwargs):
@@ -55,3 +53,8 @@ class time_table(models.Model):
 
     def __str__(self):
         return self.start_time
+    
+# class time_table_Serializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = time_table
+#         fields = '__all__'

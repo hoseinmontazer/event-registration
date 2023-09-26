@@ -113,8 +113,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'time-sheet',
         'USER': 'time-sheet',
-        'PASSWORD': '12345',
-        'HOST': '127.0.0.1',
+        'PASSWORD': '12345678',
+        'HOST': '192.168.15.26',
         'PORT': '3306',
     }
 }
