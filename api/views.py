@@ -70,25 +70,25 @@ class CreateEvent(APIView):
         if (StartTime != None and EndTime != None):
             try:
                 if time_table.objects.filter(start_time=StartTime,user_id=userId) :
-                    content = {'message': 'you have a event in this time please change time or edit your event'}
+                    content = {'status' : '400' ,'message': 'you have a event in this time please change time or edit your event'}
                     return Response(content)
                 else:
                     t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, end_time=EndTime)
-                    content = {'message': 'your task has been successfully created'}
+                    content = {'status' : '200' ,'message': 'your task has been successfully created'}
                     return Response(content)
             except :
-                content = {'message': 'your task was not created, please try again'}
+                content = {'status' : '400' ,'message': 'your task was not created, please try again'}
                 return Response(content)
         elif (StartTime != None and EndTime == None):
                 if time_table.objects.filter(start_time=StartTime,user_id=userId) :
-                    content = {'message': 'you have a event in this time please change time or edit your event'}
+                    content = {'status' : '400' ,'message': 'you have a event in this time please change time or edit your event'}
                     return Response(content)
                 else:
                     t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime)
-                    content = {'message': 'your task has been successfully created'}
+                    content = {'status' : '200' ,'message': 'your task has been successfully created'}
                     return Response(content)
         else:
-                content = {'message': 'start time or endtime is empty'}
+                content = {'status' : '400' ,'message': 'start time or endtime is empty'}
                 return Response(content)            
 
 
