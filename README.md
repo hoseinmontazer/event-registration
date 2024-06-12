@@ -1,2 +1,2 @@
-# python-jwt-authentication
-djoser
+# event registration
+django
