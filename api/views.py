@@ -51,8 +51,23 @@ class CreateEvent(APIView):
         body_unicode = request.body.decode('utf-8')
         body = json.loads(body_unicode)
         print("body",body)
-        EventSummery = body['EventSummery']
+        # EventTitle = body['EventTitle']
+        # EventSummery = body['EventSummery']
         #print(EventSummery)
+
+
+        if (len(body['EventTitle']) == 0):
+            print (len(body['EventTitle']))
+            EventTitle = None
+        else:
+            EventTitle = body['EventTitle']
+
+        if (len(body['EventSummery']) == 0):
+            print (len(body['EventSummery']))
+            EventSummery = None
+        else:
+            EventSummery = body['EventSummery']
+
         if (len(body['StartTime']) == 0):
             print (len(body['StartTime']))
             StartTime = None
@@ -60,35 +75,37 @@ class CreateEvent(APIView):
         else:
             StartTime = datetime.datetime.fromtimestamp(int(body['StartTime']))
             print("ssss2",StartTime)
+
         if (len(body['EndTime']) == 0):
             print (len(body['EndTime']))
             EndTime = None
         else:
             EndTime = datetime.datetime.fromtimestamp(int(body['EndTime']))
         
+
         #print(request.user.id)
-        if (StartTime != None and EndTime != None):
+        if (StartTime != None and EndTime != None and EventTitle!= None):
             try:
                 if time_table.objects.filter(start_time=StartTime,user_id=userId) :
                     content = {'status' : '400' ,'message': 'you have a event in this time please change time or edit your event'}
                     return Response(content)
                 else:
-                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, end_time=EndTime)
+                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, end_time=EndTime ,title_event=EventTitle)
                     content = {'status' : '200' ,'message': 'your task has been successfully created'}
                     return Response(content)
             except :
                 content = {'status' : '400' ,'message': 'your task was not created, please try again'}
                 return Response(content)
-        elif (StartTime != None and EndTime == None):
+        elif (StartTime != None and EndTime == None and EventTitle!= None):
                 if time_table.objects.filter(start_time=StartTime,user_id=userId) :
                     content = {'status' : '400' ,'message': 'you have a event in this time please change time or edit your event'}
                     return Response(content)
                 else:
-                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime)
+                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, title_event=EventTitle)
                     content = {'status' : '200' ,'message': 'your task has been successfully created'}
                     return Response(content)
         else:
-                content = {'status' : '400' ,'message': 'start time or endtime is empty'}
+                content = {'status' : '400' ,'message': 'start time or endtime or title is empty'}
                 return Response(content)            
 
 

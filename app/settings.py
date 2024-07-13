@@ -114,7 +114,7 @@ DATABASES = {
         'NAME': 'time-sheet',
         'USER': 'time-sheet',
         'PASSWORD': '12345678',
-        'HOST': '192.168.15.26',
+        'HOST': '192.168.35.82',
         'PORT': '3306',
     }
 }

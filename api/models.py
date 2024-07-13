@@ -46,9 +46,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class time_table(models.Model):
     user = models.ForeignKey(User, to_field='id' , on_delete=models.CASCADE)
-    summery_event = models.CharField(max_length=1000)
+    title_event = models.CharField(max_length=1000)
+    summery_event = models.CharField(max_length=2000)
     start_time = models.DateTimeField('date published')
-    end_time = models.DateTimeField('date published')
+    #end_time = models.DateTimeField('date published')
     end_time = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
