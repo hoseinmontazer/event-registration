@@ -200,6 +200,15 @@ class EditEVENT (APIView):
                         TempEndTime = None
                         print ("TempEndTime",TempEndTime)
 
+
+                    if 'TempEventTitle' in request.headers:
+                        TempEventTitle = request.headers['TempEventTitle']
+                        print("TempEventSummery is :",TempEventSummery)
+                        editSummeryEvent = time_table.objects.filter(id=taskId).update(title_event=TempEventTitle)
+                    else:
+                        TempEventTitle = None
+                        print ("TempEventTitle is :",TempEventTitle)
+
                     content = {'message': 'your task was sucsessfully edited , try again'}
                     return Response(content)
                 else:
