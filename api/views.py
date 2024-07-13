@@ -32,7 +32,7 @@ class Time_Table(APIView):
 
             for p in AllEvent:
                 #print ("hi p",p)
-                updateContent = {'id': p.id ,'summery_event': p.summery_event, 'start_time': p.start_time,'end_time': p.end_time}
+                updateContent = {'id': p.id ,'title_event': p.title_event,'summery_event': p.summery_event, 'start_time': p.start_time,'end_time': p.end_time}
                 content.append(updateContent)
             return Response(content)
         except:
