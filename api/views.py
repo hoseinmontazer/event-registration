@@ -1,19 +1,83 @@
+import logging
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import action
 from .models import *
 import datetime
-import time
-import pytz
 from django.utils import timezone
 import json
+from django.core.cache import cache
+import string
+import random
+
+
+#logger = logging.getLogger(__name__)
+
+
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from djoser.serializers import UserCreateSerializer
+from rest_framework.permissions import AllowAny
+
+class CustomUserCreateView(APIView):
+    permission_classes = [AllowAny]  # Allow anyone to access the signup endpoint
+    print("hiiiiiiiiii")
+    def post(self, request, *args, **kwargs):
+        # Check for the user_key in the headers
+        print (request.headers)
+
+        userKey = request.headers.get('userKey')
+        print(userKey)
+        if not userKey:
+            return Response({'error': 'userKey not available'}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GetInvitation(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        invite_str_value = ''.join(random.choices(string.ascii_uppercase + string.digits, k=40))
+        print(invite_str_value)
+
+        invite_str_key = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        print(invite_str_key)
+
+        cache.set(invite_str_key, invite_str_value , 1800)
+        print("pppppppppppp")
+        print(invite_str_key,"---------",invite_str_value)
+        key= cache.get(invite_str_key)
+        print(key)
+        return Response({"status":"200","message":"/api/invitation/"+invite_str_key+"/"+invite_str_value})
+    
+
+class CheckInvitation(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        invite_str_key = request.headers['invitestrkey']
+        print("0000000")
+        invite_value= cache.get(invite_str_key)
+        print(invite_value)
+        return Response({"status":"200","message":"/api/invitation/"})
+    
+
 
 class Time_Table(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         userId = request.user.id
-        print(userId)
+        print("get time tabe:",userId)
+
         content=[]
         try:
             if 'pubDate' in request.headers:
@@ -41,7 +105,6 @@ class Time_Table(APIView):
 
 class CreateEvent(APIView):
     permission_classes = (IsAuthenticated,)
-    print("ooooo")
     def post(self, request):
         #tz = 'Europe/Berlin'
         #print (timezone.now())
