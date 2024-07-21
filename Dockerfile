@@ -1,4 +1,4 @@
-FROM python:3
+FROM registry.uid.ir/uid/python:3
 workdir /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
