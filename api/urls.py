@@ -32,6 +32,9 @@ from django.urls import path, include
 from .views import CustomUserCreateView
 from api import views
 from rest_framework_simplejwt import views as jwt_views
+from django.conf.urls.static import static
+from django.conf import settings
+
 
 urlpatterns = [
     path('event/', views.Time_Table.as_view(), name='event'),
@@ -39,6 +42,7 @@ urlpatterns = [
     path('delete/', views.DeleteEvent.as_view(), name='DeleteEvent'),
     path('edit/', views.EditEVENT.as_view(), name='edit'),
     path('get-invitation/',views.GetInvitation.as_view(),name='GetInvitation'),
+    path('user-info/',views.GetUserInfo.as_view(),name='GetUserInfo'),
     #re_path(r'^check-invitation/', views.CheckInvitation.as_view(),name='CheckInvitation')
     # path('history/', views.TaskHistory.as_view(), name='history'),
     # path('edit-history/', views.TaskEditHistory.as_view(), name='edit-history'),
@@ -56,4 +60,4 @@ urlpatterns = [
 
     # Include Djoser's JWT URLs if using JWT
     path('auth/', include('djoser.urls.jwt')),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

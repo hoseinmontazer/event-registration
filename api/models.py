@@ -75,6 +75,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255)
+    about_me = models.CharField(max_length=2000,null=True, blank=True)
+    avatar = models.ImageField(default='profile_pics/default.jpg', upload_to='profile_pics')
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 

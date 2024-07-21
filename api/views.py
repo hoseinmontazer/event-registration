@@ -31,8 +31,8 @@ class CustomUserCreateView(APIView):
 
         userKey = request.headers.get('userKey')
         print(userKey)
-        if not userKey:
-            return Response({'error': 'userKey not available'}, status=status.HTTP_400_BAD_REQUEST)
+        # if not userKey:
+        #     return Response({'error': 'userKey not available'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -71,6 +71,23 @@ class CheckInvitation(APIView):
     
 
 
+class GetUserInfo(APIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request):
+        userId = request.user.id
+        #CurrentUser = User.objects.filter(id=userId).values()
+        CurrentUser = User.objects.filter(id=userId).values('first_name','last_name','email','about_me','avatar','last_login')
+        print(CurrentUser)
+        content=[]
+        for p in CurrentUser:
+            print ("hi p", p['first_name'])
+            updateContent = {'first_name': p['first_name'] ,'last_name': p['last_name'],'email': p['email'], 'about_me': p['about_me'],'avatar': p['avatar'],'last_login':p['last_login']}
+            #print ("hi pp" ,updateContent)
+            content.append(updateContent)
+        return Response(content)
+        #return Response({"status":"200","message":"Hello user info"}) 
+
+
 class Time_Table(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -101,6 +118,9 @@ class Time_Table(APIView):
             return Response(content)
         except:
             return Response({"status":"400","message":"event not found or publish date not avalable"})
+
+
+
 
 
 class CreateEvent(APIView):
