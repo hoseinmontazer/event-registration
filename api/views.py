@@ -20,7 +20,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from djoser.serializers import UserCreateSerializer
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny # type: ignore
 
 class CustomUserCreateView(APIView):
     permission_classes = [AllowAny]  # Allow anyone to access the signup endpoint
@@ -176,14 +176,20 @@ class CreateEvent(APIView):
                     return Response(content)
                 else:
                     delta = EndTime - StartTime
-                    print("daltaaaaaaaaaaaaaa",type(delta))
+                    print("daltaaaaaaaaaaaaaa",type(delta), delta)
+                    print(delta.total_seconds())
+                    t=delta.total_seconds()
+  
                     
-                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, end_time=EndTime ,title_event=EventTitle,time_spent=delta)
-                    print(t)
+                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, end_time=EndTime ,title_event=EventTitle,time_spent=delta.total_seconds())
+                    print("dddddd",t)
+
                     content = {'status' : '200' ,'message': 'your task has been successfully created'}
                     return Response(content)
-            except :
-                content = {'status' : '400' ,'message': 'your task was not created, please try again'}
+            #except :
+            except Exception as error:
+                print("An exception occurred:", error)
+                content = {'status' : '400' ,'message': '11your task was not created, please try again'}
                 return Response(content)
         elif (StartTime != None and EndTime == None and EventTitle!= None):
                 if time_table.objects.filter(start_time=StartTime,user_id=userId) :
