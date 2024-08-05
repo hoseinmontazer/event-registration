@@ -98,9 +98,11 @@ class Time_Table(APIView):
         content=[]
         try:
             if 'pubDate' in request.headers:
-                pubDate = request.headers['pubDate']
-                print(pubDate)
-                AllEvent = time_table.objects.raw('SELECT * FROM api_time_table WHERE  date(start_time) = %s AND user_id=%s ', [pubDate,userId])
+                #pubDate = request.headers['pubDate']
+                pubDate = datetime.datetime.fromtimestamp(int(request.headers['pubDate']))
+                print("lllllll",pubDate)
+                AllEvent = time_table.objects.raw('SELECT * FROM api_time_table WHERE  start_time = %s AND user_id=%s ', [pubDate,userId])
+                print(AllEvent)
                 # if not pubDate :
                 #     print ("not available")
                 #     AllEvent = time_table.objects.raw('select * from api_time_table WHERE user_id =%s', [userId])
@@ -173,7 +175,11 @@ class CreateEvent(APIView):
                     content = {'status' : '400' ,'message': 'you have a event in this time please change time or edit your event'}
                     return Response(content)
                 else:
-                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, end_time=EndTime ,title_event=EventTitle)
+                    delta = EndTime - StartTime
+                    print("daltaaaaaaaaaaaaaa",type(delta))
+                    
+                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, end_time=EndTime ,title_event=EventTitle,time_spent=delta)
+                    print(t)
                     content = {'status' : '200' ,'message': 'your task has been successfully created'}
                     return Response(content)
             except :
@@ -307,6 +313,51 @@ class EditEVENT (APIView):
 
 
 
+
+
+class CalculateTasks(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        try:
+            print("try calculate")
+            userId = request.user.id
+            print ("userId is: " ,userId)
+
+            print(request.headers)
+            if 'start-date' in request.headers:
+                start_date = request.headers['start-date']
+                print("start_date is :",start_date)
+            else:
+                start_date = None
+                print ("start_date is :",start_date)
+
+
+            if 'End-Date' in request.headers:
+                End_Date = request.headers['End-Date']
+                print("End-Date is :",End_Date)
+            else:
+                End_Date = None
+                print ("End-Date is :",End_Date)
+
+            if (start_date != None and End_Date != None):
+                print("hi")
+
+            content = {'message': 'helllo'}
+            return Response(content)
+        
+        except Exception as e:
+            content = {'message': 'your task was not deleted , try again'}
+            return Response(content)
+
+
+
+
+
+
+
+
+
 # class TaskHistory(APIView):
 #     permission_classes = (IsAuthenticated,)
 #     def post(self, request):
@@ -353,18 +404,18 @@ class EditEVENT (APIView):
 
 
 
-class TaskDeletHistory(APIView):
-    permission_classes = (IsAuthenticated,)
-    def post(self, request):
-        userId = request.user.id
-        historyTaskId = request.headers['history-id']
-        #print(tempStopTask,tempStartTask,tempComment)
-        try:
-            if task.objects.filter(id=historyTaskId):
-                print('hiiii')
-                deleteTaskName = task_detail.objects.filter(id=historyTaskId).delete()
-                content = {'message': 'your history of id was been deleted'}
-                return Response(content)
-        except Exception as e:
-            content = {'message': 'can not find history id , try again'}
-            return Response(content)
+# class TaskDeletHistory(APIView):
+#     permission_classes = (IsAuthenticated,)
+#     def post(self, request):
+#         userId = request.user.id
+#         historyTaskId = request.headers['history-id']
+#         #print(tempStopTask,tempStartTask,tempComment)
+#         try:
+#             if task.objects.filter(id=historyTaskId):
+#                 print('hiiii')
+#                 deleteTaskName = task_detail.objects.filter(id=historyTaskId).delete()
+#                 content = {'message': 'your history of id was been deleted'}
+#                 return Response(content)
+#         except Exception as e:
+#             content = {'message': 'can not find history id , try again'}
+#             return Response(content)

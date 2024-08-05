@@ -109,7 +109,7 @@ class time_table(models.Model):
     start_time = models.DateTimeField('date published')
     #end_time = models.DateTimeField('date published')
     end_time = models.DateTimeField(null=True, blank=True)
-
+    time_spent = models.DateTimeField(null=True, blank=True)
     def __str__(self):
         return self.start_time
     

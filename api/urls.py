@@ -38,11 +38,12 @@ from django.conf import settings
 
 urlpatterns = [
     path('event/', views.Time_Table.as_view(), name='event'),
-    path('create/', views.CreateEvent.as_view(), name='CreateEvent'),
-    path('delete/', views.DeleteEvent.as_view(), name='DeleteEvent'),
-    path('edit/', views.EditEVENT.as_view(), name='edit'),
-    path('get-invitation/',views.GetInvitation.as_view(),name='GetInvitation'),
-    path('user-info/',views.GetUserInfo.as_view(),name='GetUserInfo'),
+    path('event/create/', views.CreateEvent.as_view(), name='CreateEvent'),
+    path('event/delete/', views.DeleteEvent.as_view(), name='DeleteEvent'),
+    path('event/edit/', views.EditEVENT.as_view(), name='edit'),
+    path('event/get-invitation/',views.GetInvitation.as_view(),name='GetInvitation'),
+    path('event/user-info/',views.GetUserInfo.as_view(),name='GetUserInfo'),
+    path('event/calculate/',views.CalculateTasks.as_view(),name='ClculateTasks'),
     #re_path(r'^check-invitation/', views.CheckInvitation.as_view(),name='CheckInvitation')
     # path('history/', views.TaskHistory.as_view(), name='history'),
     # path('edit-history/', views.TaskEditHistory.as_view(), name='edit-history'),
