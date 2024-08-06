@@ -12,7 +12,6 @@ from django.core.cache import cache
 import string
 import random
 
-
 #logger = logging.getLogger(__name__)
 
 
@@ -115,7 +114,7 @@ class Time_Table(APIView):
 
             for p in AllEvent:
                 #print ("hi p",p)
-                updateContent = {'id': p.id ,'title_event': p.title_event,'summery_event': p.summery_event, 'start_time': p.start_time,'end_time': p.end_time}
+                updateContent = {'id': p.id ,'title_event': p.title_event,'summery_event': p.summery_event, 'start_time': p.start_time,'end_time': p.end_time , 'time_spent': p.time_spent}
                 content.append(updateContent)
             return Response(content)
         except:
@@ -179,9 +178,9 @@ class CreateEvent(APIView):
                     print("daltaaaaaaaaaaaaaa",type(delta), delta)
                     print(delta.total_seconds())
                     t=delta.total_seconds()
-  
-                    
-                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=StartTime, end_time=EndTime ,title_event=EventTitle,time_spent=delta.total_seconds())
+                    print("ttime",t,type(t) , type(EndTime), type(StartTime))
+                    t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=str(StartTime), end_time=str(EndTime) ,title_event=EventTitle,time_spent=delta.total_seconds())
+                    #t = time_table.objects.create(user_id=userId, summery_event=EventSummery, start_time=str(StartTime), end_time=str(EndTime) ,title_event=EventTitle)
                     print("dddddd",t)
 
                     content = {'status' : '200' ,'message': 'your task has been successfully created'}
@@ -253,56 +252,93 @@ class EditEVENT (APIView):
             taskId = request.headers['taskId']
             print ("taskId is: " ,taskId)
             #check start time is avaliable
+            print(request.headers)
             if 'taskId' in request.headers:
                 print("ppppp")
                 selectedEvent = time_table.objects.filter(id=taskId).values()
                 print("editedEvent is: ",selectedEvent)
                 if selectedEvent :
-                    # print("editedEvent is: ",type(selectedEvent))
-                    # x = selectedEvent.get()
-                    # print (x)
-                    # print (x["id"])
-                    # for p in editedEvent:
-                    #      print (p.user_id)
 
                     #check start time is temporary event summery 
-                    if 'TempEventSummery' in request.headers:
-                        TempEventSummery = request.headers['TempEventSummery']
-                        print("TempEventSummery is :",TempEventSummery)
-                        editSummeryEvent = time_table.objects.filter(id=taskId).update(summery_event=TempEventSummery)
-                    else:
+                    #if 'TempEventSummery' in request.headers:
+                    if (len(request.headers['TempEventSummery']) == 0):
                         TempEventSummery = None
                         print ("TempEventSummery is :",TempEventSummery)
 
-                    #check temporary start time is avaliable
-                    if 'TempStartTime' in request.headers:
-                        #print (len(request.headers['TempStartTime']))
-                        TempStartTime = datetime.datetime.fromtimestamp(int(request.headers['TempStartTime']))
-                        print("TempStartTime is :",TempStartTime)
-                        editedStartTimeEvent = time_table.objects.filter(id=taskId).update(start_time=TempStartTime)
                     else:
+                        TempEventSummery = request.headers['TempEventSummery']
+                        print("TempEventSummery is :",TempEventSummery)
+                        editSummeryEvent = time_table.objects.filter(id=taskId).update(summery_event=TempEventSummery)
+
+
+
+
+                    #check temporary start time is avaliable
+                    # if 'TempStartTime' in request.headers:
+                    if (len(request.headers['TempStartTime']) == 0):
                         TempStartTime = None
                         print ("TempStartTime",TempStartTime)
-                    #check  temporary end time is avaliable
-
-
-                    if 'TempEndTime' in request.headers:
-                        TempEndTime = datetime.datetime.fromtimestamp(int(request.headers['TempEndTime']))
-                        print("TempEndTime is :",TempEndTime)
-                        editEndTimeEvent = time_table.objects.filter(id=taskId).update(end_time=TempEndTime)
 
                     else:
+                        TempStartTime = datetime.datetime.fromtimestamp(int(request.headers['TempStartTime']))
+                        print("TempStartTime iss :",type(TempStartTime))
+                        
+                        GetEndTime = time_table.objects.filter(id=taskId).values('end_time')
+                        print(GetEndTime)    
+                        if (GetEndTime[0]['end_time'] == None ):
+                            print("hi")
+                            editedStartTimeEvent = time_table.objects.filter(id=taskId).update(start_time=str(TempStartTime))
+                        else:
+                            #p = datetime.datetime.fromtimestamp('GetEndTime')
+                            print('GetEndTime is: ',type(GetEndTime[0]['end_time']) , str(GetEndTime[0]['end_time'].replace(tzinfo=None)))
+                            print("kkkk")
+
+                            delta = GetEndTime[0]['end_time'].replace(tzinfo=None) - TempStartTime
+                            print("daltaaaaaaaaaaaaaa",type(delta), delta)
+                            print(delta.total_seconds())
+                            t=delta.total_seconds()
+                            print("ttime",t,type(t))
+
+                            editedStartTimeEvent = time_table.objects.filter(id=taskId).update(start_time=str(TempStartTime), time_spent=t)
+
+
+                    #check  temporary end time is avaliable
+                    #if 'TempEndTime' in request.headers:
+                    if (len(request.headers['TempEndTime']) == 0):
                         TempEndTime = None
                         print ("TempEndTime",TempEndTime)
 
-
-                    if 'TempEventTitle' in request.headers:
-                        TempEventTitle = request.headers['TempEventTitle']
-                        print("TempEventSummery is :",TempEventSummery)
-                        editSummeryEvent = time_table.objects.filter(id=taskId).update(title_event=TempEventTitle)
                     else:
+                        TempEndTime = datetime.datetime.fromtimestamp(int(request.headers['TempEndTime']))
+                        print("TempEndTime is :",TempEndTime)
+
+                        GetStartTime = time_table.objects.filter(id=taskId).values('start_time')
+
+                        if (GetStartTime[0]['start_time'] == None ):
+                            print("nnnn")
+                            editEndTimeEvent = time_table.objects.filter(id=taskId).update(end_time=TempEndTime)
+                        else:
+
+                            print('GetStartTime is: ',type(GetStartTime[0]['start_time']) , str(GetStartTime[0]['start_time'].replace(tzinfo=None)))                        
+                            delta = TempEndTime - GetStartTime[0]['start_time'].replace(tzinfo=None) 
+                            print("daltaaaaaaaaaaaaaa",type(delta), delta)
+                            print(delta.total_seconds())
+                            t=delta.total_seconds()
+                            print("ttime",t,type(t))
+                            editEndTimeEvent = time_table.objects.filter(id=taskId).update(end_time=TempEndTime , time_spent=t)
+
+
+
+                    #if 'TempEventTitle' in request.headers:
+                    if (len(request.headers['TempEventTitle']) == 0):
                         TempEventTitle = None
                         print ("TempEventTitle is :",TempEventTitle)
+
+                    else:
+                        TempEventTitle = request.headers['TempEventTitle']
+                        print("TempEventTitle is :",TempEventTitle)
+                        editSummeryEvent = time_table.objects.filter(id=taskId).update(title_event=TempEventTitle)
+
 
                     content = {'message': 'your task was sucsessfully edited , try again'}
                     return Response(content)
@@ -311,9 +347,9 @@ class EditEVENT (APIView):
                     content = {'message': 'id not exist , try again'}
                     return Response(content)
     
-            
-                #editedEvent = time_table.objects.filter(id=taskId).update(summery_event='some value')
+
         except Exception as e:
+            print("An exception occurred:", e)
             content = {'message': 'your task was not edited , try again'}
             return Response(content)
 
